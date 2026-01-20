@@ -1,0 +1,917 @@
+package consumer
+
+import (
+	"fmt"
+	"mpay/ui/components/button"
+	"mpay/ui/components/card"
+	"mpay/ui/components/datepicker"
+	"mpay/ui/components/dropdown"
+	"mpay/ui/components/form"
+	"mpay/ui/components/icon"
+	"mpay/ui/components/input"
+	"mpay/ui/components/label"
+	"mpay/ui/components/pageheader"
+	"mpay/ui/handlers/url"
+	"mpay/ui/layouts"
+	"mpay/ui/utils"
+	"time"
+)
+
+type NewPageProps struct {
+	CurrentPath string
+	Form        FormProps
+}
+
+type FormProps struct {
+	// ---------- flow ----------
+	ShowEntry bool
+
+	// ---------- check user ----------
+	PhoneNumber string
+
+	// ---------- personal information ----------
+	Title       string
+	FullName    string
+	Gender      string
+	FatherName  string
+	DateOfBirth time.Time
+
+	// ---------- identification ----------
+	NRCType     string
+	NRCState    string
+	NRCTownship string
+	NRCCitizen  string
+	NRCNumber   string
+
+	Occupation string
+
+	// ---------- address ----------
+	Division     string
+	Township     string
+	AddressLine1 string
+	AddressLine2 string
+
+	NRCFront string
+
+	// ---------- validation ----------
+	Errors map[string]string
+}
+
+type titleOption struct {
+	Value string
+	Label string
+}
+
+var titleOptions = []titleOption{
+	{Value: "U", Label: "U"},
+	{Value: "DAW", Label: "Daw"},
+}
+
+type GenderOption struct {
+	Value string
+	Label string
+}
+
+var genderOptions = []GenderOption{
+	{Value: "Male", Label: "Male"},
+	{Value: "Female", Label: "Female"},
+}
+
+var NRCTypeOptions = []struct {
+	Value string
+	Label string
+}{
+	{Value: "NRC", Label: "NRC"},
+	{Value: "Passport", Label: "Passport"},
+}
+
+type nrcOption struct {
+	Value string
+	Label string
+}
+
+var NRCStateOptions = []nrcOption{
+	{Value: "1", Label: "1"},
+	{Value: "2", Label: "2"},
+	{Value: "12", Label: "12"},
+}
+
+var NRCTownshipOptions = []nrcOption{
+	{Value: "MaGaDa", Label: "MaGaDa"},
+	{Value: "PaKaNa", Label: "PaKaNa"},
+}
+
+var NRCCitizenOptions = []nrcOption{
+	{Value: "N", Label: "N"},
+	{Value: "P", Label: "P"},
+	{Value: "E", Label: "E"},
+}
+
+var occupationOptions = []struct {
+	Value string
+	Label string
+}{
+	{Value: "teacher", Label: "Teacher"},
+	{Value: "doctor", Label: "Doctor"},
+	{Value: "engineer", Label: "Engineer"},
+	{Value: "farmer", Label: "Farmer"},
+	{Value: "business", Label: "Business"},
+	{Value: "other", Label: "Other"},
+}
+
+var divisionOptions = []struct {
+	Value string
+	Label string
+}{
+	{Value: "yangon", Label: "Yangon"},
+	{Value: "mandalay", Label: "Mandalay"},
+	{Value: "naypyidaw", Label: "Naypyidaw"},
+	{Value: "ayeyarwady", Label: "Ayeyarwady"},
+	{Value: "bago", Label: "Bago"},
+	{Value: "magway", Label: "Magway"},
+	{Value: "sagaing", Label: "Sagaing"},
+	{Value: "tanintharyi", Label: "Tanintharyi"},
+	{Value: "kayin", Label: "Kayin"},
+	{Value: "mon", Label: "Mon"},
+	{Value: "rakhine", Label: "Rakhine"},
+	{Value: "shann", Label: "Shan"},
+	{Value: "chin", Label: "Chin"},
+	{Value: "kayah", Label: "Kayah"},
+}
+
+var townshipOptions = []struct {
+	Value string
+	Label string
+}{
+	{Value: "aungmyaytharzan", Label: "Aung Myay Thar Zan"},
+	{Value: "chanayethazan", Label: "Chan Aye Thar Zan"},
+	{Value: "kamayut", Label: "Kamayut"},
+	{Value: "hlegu", Label: "Hlegu"},
+	{Value: "insein", Label: "Insein"},
+	{Value: "shwepyitha", Label: "Shwepyitha"},
+	{Value: "thingangyun", Label: "Thingangyun"},
+	{Value: "taunggyi", Label: "Taunggyi"},
+	{Value: "pyinmana", Label: "Pyinmana"},
+}
+
+templ NewPage(props NewPageProps) {
+	@layouts.BaseLayout(props.CurrentPath) {
+		<div class="page-content">
+			@pageheader.PageHeader(pageheader.Props{
+				Title:       "User registration",
+				Description: "Onboard MPay customers with ease and peace of mind.",
+			})
+			@EntryFormContainer(props)
+		</div>
+	}
+}
+
+templ EntryFormContainer(props NewPageProps) {
+	<div id="consumer-entry-form-container">
+		if !props.Form.ShowEntry {
+			@CheckUserForm(props.Form)
+		} else {
+			@OnboardUserForm(props.Form)
+		}
+	</div>
+}
+
+templ CheckUserForm(props FormProps) {
+	@card.Card(card.Props{Class: "w-35"}) {
+		// centered card
+		@card.Header() {
+			@card.Title() {
+				Check User
+			}
+			@card.Description() {
+				Validate with mobile number
+			}
+		}
+		@card.Content() {
+			<form
+				method="post"
+				class="tui-form"
+				hx-post={ url.Customer_ConsumerNewPage }
+				hx-target="#consumer-entry-form-container"
+				hx-swap="outerHTML"
+			>
+				@form.Item() {
+					@label.Label(label.Props{
+						For:      "phone_number",
+						Required: true,
+					}) {
+						Registering mobile number
+					}
+					@input.Input(input.Props{
+						ID:          "phone_number",
+						Name:        "phone_number",
+						Type:        input.TypeText,
+						Placeholder: "+95 xxx xxx xxx",
+						Value:       props.PhoneNumber,
+						HasError:    props.Errors["phone_number"] != "",
+					})
+					if props.Errors["phone_number"] != "" {
+						@form.Message(form.MessageProps{
+							Variant: form.MessageVariantError,
+						}) {
+							{ props.Errors["phone_number"] }
+						}
+					}
+				}
+				<div class="tui-form-actions">
+					@button.Button(button.Props{Type: button.TypeSubmit, Class: "w-50"}) {
+						Validate
+					}
+					@button.Button(button.Props{Variant: button.VariantOutline, Href: url.Customer_ConsumersList, Class: "w-50"}) {
+						Back
+					}
+				</div>
+			</form>
+		}
+		@card.Footer() {
+			<a href="/skip-for-now" class="login-link-alt">Skip for now</a>
+		}
+	}
+}
+
+templ OnboardUserForm(props FormProps) {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Onboard consumer users
+			}
+		}
+		@card.Content() {
+			<form
+				method="post"
+				class="tui-onboard-form"
+				hx-post={ url.Customer_ConsumerNewPage }
+				hx-target="#consumer-entry-form-container"
+				hx-swap="outerHTML"
+			>
+				<div class="tui-onboard-columns">
+					<!-- Personal Information Column -->
+					<div class="tui-onboard-col">
+						<div class="tui-onboard-title">Personal Information</div>
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "title-trigger",
+								Required: true,
+							}) {
+								Title
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("title-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="title"
+									name="title"
+									value={ props.Title }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("title-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["title"] != "",
+								}) {
+									if props.Title == "" {
+										{ "Select title" }
+									} else {
+										{ props.Title }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range titleOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["title"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["title"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "full_name", Required: true}) {
+								Full name
+							}
+							@input.Input(input.Props{
+								ID:          "full_name",
+								Name:        "full_name",
+								Type:        input.TypeText,
+								Placeholder: "Full name",
+								Value:       props.FullName,
+								HasError:    props.Errors["full_name"] != "",
+							})
+							if props.Errors["full_name"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["full_name"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "phone_number", Required: true}) {
+								Registering mobile number
+							}
+							@input.Input(input.Props{
+								ID:          "phone_number",
+								Name:        "phone_number",
+								Type:        input.TypeNumber,
+								Placeholder: "Phone number",
+								Value:       props.PhoneNumber,
+								HasError:    props.Errors["phone_number"] != "",
+							})
+							if props.Errors["phone_number"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["phone_number"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "gender-trigger",
+								Required: true,
+							}) {
+								Gender
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("gender-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="gender"
+									name="gender"
+									value={ props.Gender }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("gender-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["gender"] != "",
+								}) {
+									if props.Gender == "" {
+										{ "Select Gender" }
+									} else {
+										{ props.Gender }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range genderOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["gender"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["gender"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "father_name", Required: true}) {
+								Father’s name
+							}
+							@input.Input(input.Props{
+								ID:          "father_name",
+								Name:        "father_name",
+								Type:        input.TypeText,
+								Placeholder: "Father name",
+								Value:       props.FatherName,
+								HasError:    props.Errors["father_name"] != "",
+							})
+							if props.Errors["father_name"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["father_name"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "date_of_birth"}) {
+								Date of birth
+							}
+							@datepicker.DatePicker(datepicker.Props{
+								ID:          "date_of_birth",
+								Name:        "date_of_birth",
+								Value:       props.DateOfBirth,
+								Placeholder: "Select date",
+								Format:      datepicker.FormatLOCALE_LONG,
+							})
+						}
+					</div>
+					<div class="tui-onboard-divider"></div>
+					<!-- Identification Column -->
+					<div class="tui-onboard-col">
+						<div class="tui-onboard-title">Identification</div>
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "nrc_type-trigger",
+								Required: true,
+							}) {
+								NRC Type
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("nrc_type-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="nrc_type"
+									name="nrc_type"
+									value={ props.NRCType }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("nrc_type-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["nrc_type"] != "",
+								}) {
+									if props.Gender == "" {
+										{ "Select NRC Type" }
+									} else {
+										{ props.NRCType }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range NRCTypeOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["nrc_type"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["nrc_type"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{
+								Required: true,
+							}) {
+								NRC Format
+							}
+							<div class="tui-inline-3">
+								<!-- NRC State -->
+								@dropdown.Dropdown(dropdown.Props{
+									ID: fmt.Sprintf("nrc_state-dropdown-%s", utils.RandomID()),
+								}) {
+									<input
+										type="hidden"
+										name="nrc_state"
+										value={ props.NRCState }
+										data-tui-dropdown-value-target
+									/>
+									@dropdown.Trigger(dropdown.TriggerProps{
+										Class:    "tui-input",
+										HasError: props.Errors["nrc_state"] != "",
+									}) {
+										if props.NRCState == "" {
+											{ "12/" }
+										} else {
+											{ props.NRCState + "/" }
+										}
+									}
+									@dropdown.Content() {
+										for _, opt := range NRCStateOptions {
+											@dropdown.Item(dropdown.ItemProps{
+												Attributes: templ.Attributes{
+													"data-value": opt.Value,
+													"data-label": opt.Label,
+												},
+											}) {
+												{ opt.Label }
+											}
+										}
+									}
+								}
+								<!-- NRC Township -->
+								@dropdown.Dropdown(dropdown.Props{
+									ID: fmt.Sprintf("nrc_township-dropdown-%s", utils.RandomID()),
+								}) {
+									<input
+										type="hidden"
+										name="nrc_township"
+										value={ props.NRCTownship }
+										data-tui-dropdown-value-target
+									/>
+									@dropdown.Trigger(dropdown.TriggerProps{
+										Class:    "tui-input",
+										HasError: props.Errors["nrc_township"] != "",
+									}) {
+										if props.NRCTownship == "" {
+											{ "MaGaDa" }
+										} else {
+											{ props.NRCTownship }
+										}
+									}
+									@dropdown.Content() {
+										for _, opt := range NRCTownshipOptions {
+											@dropdown.Item(dropdown.ItemProps{
+												Attributes: templ.Attributes{
+													"data-value": opt.Value,
+													"data-label": opt.Label,
+												},
+											}) {
+												{ opt.Label }
+											}
+										}
+									}
+								}
+								<!-- NRC Citizen -->
+								@dropdown.Dropdown(dropdown.Props{
+									ID: fmt.Sprintf("nrc_citizen-dropdown-%s", utils.RandomID()),
+								}) {
+									<input
+										type="hidden"
+										name="nrc_citizen"
+										value={ props.NRCCitizen }
+										data-tui-dropdown-value-target
+									/>
+									@dropdown.Trigger(dropdown.TriggerProps{
+										Class:    "tui-input",
+										HasError: props.Errors["nrc_citizen"] != "",
+									}) {
+										if props.NRCCitizen == "" {
+											{ "N" }
+										} else {
+											{ props.NRCCitizen }
+										}
+									}
+									@dropdown.Content() {
+										for _, opt := range NRCCitizenOptions {
+											@dropdown.Item(dropdown.ItemProps{
+												Attributes: templ.Attributes{
+													"data-value": opt.Value,
+													"data-label": opt.Label,
+												},
+											}) {
+												{ opt.Label }
+											}
+										}
+									}
+								}
+							</div>
+							<!-- Optional combined error -->
+							if props.Errors["nrc"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["nrc"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "nrc_number", Required: true}) {
+								Account Type
+							}
+							@input.Input(input.Props{
+								ID:          "nrc_number",
+								Name:        "nrc_number",
+								Type:        input.TypeText,
+								Placeholder: "Enter ID number",
+								Value:       props.NRCNumber,
+								HasError:    props.Errors["nrc_number"] != "",
+							})
+							if props.Errors["nrc_number"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["nrc_number"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "occupation-trigger",
+								Required: false,
+							}) {
+								Occupation (Optional)
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("occupation-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="occupation"
+									name="occupation"
+									value={ props.Occupation }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("occupation-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["occupation"] != "",
+								}) {
+									if props.Title == "" {
+										{ "Select Occupation" }
+									} else {
+										{ props.Occupation }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range occupationOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["occupation"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["occupation"] }
+								}
+							}
+						}
+						@form.Item(form.ItemProps{
+							Class: "h-32",
+						}) {
+							@label.Label(label.Props{For: "nrc_front", Required: true}) {
+								Photos
+							}
+							<div class="upload-container">
+								<!-- Left info -->
+								<div class="upload-info">
+									<span class="upload-title">NRC Front</span>
+									<span class="upload-subtitle">Maximum size 20 MB</span>
+								</div>
+								<!-- Right upload button -->
+								<label for="nrc_front" class="upload-button">
+									<span>Upload</span>
+									@icon.Upload(icon.Props{Size: 20})
+								</label>
+								<!-- Hidden real input -->
+								@input.Input(input.Props{
+									ID:       "nrc_front",
+									Name:     "nrc_front",
+									Type:     input.TypeFile,
+									HasError: props.Errors["nrc_front"] != "",
+									Class:    "tui-upload-hidden-input", // hides the real input
+								})
+							</div>
+							if props.Errors["nrc_front"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["nrc_front"] }
+								}
+							}
+						}
+						@form.Item(form.ItemProps{
+							Class: "h-32",
+						}) {
+							<div class="upload-container">
+								<!-- Left info -->
+								<div class="upload-info">
+									<span class="upload-title">NRC back</span>
+									<span class="upload-subtitle">Maximum size 20 MB</span>
+								</div>
+								<!-- Right upload button -->
+								<label for="nrc_back" class="upload-button">
+									<span>Upload</span>
+									@icon.Upload(icon.Props{Size: 20})
+								</label>
+								<!-- Hidden real input -->
+								@input.Input(input.Props{
+									ID:       "nrc_back",
+									Name:     "nrc_back",
+									Type:     input.TypeFile,
+									HasError: props.Errors["nrc_back"] != "",
+									Class:    "tui-upload-hidden-input", // hides the real input
+								})
+							</div>
+							if props.Errors["nrc_back"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["nrc_back"] }
+								}
+							}
+						}
+						@form.Item(form.ItemProps{
+							Class: "h-24",
+						}) {
+							<div class="upload-container">
+								<!-- Left info -->
+								<div class="upload-info">
+									<span class="upload-title">Profile</span>
+									<span class="upload-subtitle">Maximum size 20 MB</span>
+								</div>
+								<!-- Right upload button -->
+								<label for="nrc_back" class="upload-button">
+									<span>Upload</span>
+									@icon.Upload(icon.Props{Size: 20})
+								</label>
+								<!-- Hidden real input -->
+								@input.Input(input.Props{
+									ID:       "profile",
+									Name:     "profile",
+									Type:     input.TypeFile,
+									HasError: props.Errors["profile"] != "",
+									Class:    "tui-upload-hidden-input", // hides the real input
+								})
+							</div>
+							if props.Errors["profile"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["profile"] }
+								}
+							}
+						}
+					</div>
+					<div class="tui-onboard-divider"></div>
+					<!-- Address Column -->
+					<div class="tui-onboard-col">
+						<div class="tui-onboard-title">Address</div>
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "division-trigger",
+								Required: true,
+							}) {
+								Division
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("division-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="division"
+									name="division"
+									value={ props.Division }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("division-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["division"] != "",
+								}) {
+									if props.Division == "" {
+										{ "Select Division" }
+									} else {
+										{ props.Division }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range divisionOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["division"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["division"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{
+								For:      "township-trigger",
+								Required: true,
+							}) {
+								Township
+							}
+							@dropdown.Dropdown(dropdown.Props{
+								ID: fmt.Sprintf("township-dropdown-%s", utils.RandomID()),
+							}) {
+								<input
+									type="hidden"
+									id="township"
+									name="township"
+									value={ props.Township }
+									data-tui-dropdown-value-target
+								/>
+								@dropdown.Trigger(dropdown.TriggerProps{
+									ID:       fmt.Sprintf("township-trigger-%s", utils.RandomID()),
+									Class:    "tui-input",
+									HasError: props.Errors["township"] != "",
+								}) {
+									if props.Township == "" {
+										{ "Select Township" }
+									} else {
+										{ props.Township }
+									}
+								}
+								@dropdown.Content() {
+									for _, opt := range townshipOptions {
+										@dropdown.Item(dropdown.ItemProps{
+											Attributes: templ.Attributes{
+												"data-value": opt.Value,
+												"data-label": opt.Label,
+											},
+										}) {
+											{ opt.Label }
+										}
+									}
+								}
+							}
+							if props.Errors["township"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["township"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "address_line_1", Required: true}) {
+								Address line 1
+							}
+							@input.Input(input.Props{
+								ID:          "address_line_1",
+								Name:        "address_line_1",
+								Type:        input.TypeText,
+								Placeholder: "Enter the address",
+								Value:       props.AddressLine1,
+								HasError:    props.Errors["address_line_1"] != "",
+							})
+							if props.Errors["address_line_1"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["address_line_1"] }
+								}
+							}
+						}
+						@form.Item() {
+							@label.Label(label.Props{For: "address_line_2", Required: false}) {
+								Address line 2 (Optional)
+							}
+							@input.Input(input.Props{
+								ID:          "address_line_2",
+								Name:        "address_line_2",
+								Type:        input.TypeText,
+								Placeholder: "Enter the address",
+								Value:       props.AddressLine2,
+								HasError:    props.Errors["address_line_2"] != "",
+							})
+							if props.Errors["address_line_2"] != "" {
+								@form.Message(form.MessageProps{
+									Variant: form.MessageVariantError,
+								}) {
+									{ props.Errors["address_line_2"] }
+								}
+							}
+						}
+					</div>
+				</div>
+				<div class="tui-form-actions mt-4">
+					@button.Button(button.Props{Type: button.TypeSubmit}) {
+						Submit
+					}
+					@button.Button(button.Props{Variant: button.VariantOutline, Href: url.Customer_ConsumersList}) {
+						Back
+					}
+				</div>
+			</form>
+		}
+	}
+}
