@@ -1,0 +1,162 @@
+package tabs
+
+import (
+	"context"
+	"mpay/ui/utils"
+)
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ListProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	IsActive   bool
+	TabsID     string
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	IsActive   bool
+	TabsID     string
+}
+
+templ Tabs(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+
+	{{ tabsID := p.ID }}
+	if tabsID == "" {
+		{{ tabsID = utils.RandomID() }}
+	}
+
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-tabs " + p.Class }
+		data-tui-tabs
+		data-tui-tabs-id={ tabsID }
+		{ p.Attributes... }
+	>
+		{{ ctx = context.WithValue(ctx, "tabsId", tabsID) }}
+		{ children... }
+	</div>
+}
+
+templ List(props ...ListProps) {
+	{{ var p ListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+
+	{{ tabsID := IDFromContext(ctx) }}
+
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-tabs__list " + p.Class }
+		data-tui-tabs-list
+		data-tui-tabs-id={ tabsID }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+
+	{{ tabsID := p.TabsID }}
+	if tabsID == "" {
+		{{ tabsID = IDFromContext(ctx) }}
+	}
+
+	if p.Value == "" {
+		<span class="tui-error">Error: Tab Trigger missing required 'Value'.</span>
+	}
+
+	<button
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		type="button"
+		class={
+			"tui-tabs__trigger " +
+			utils.IfElse(p.IsActive, "is-active ", "") +
+			p.Class
+		}
+		data-tui-tabs-trigger
+		data-tui-tabs-id={ tabsID }
+		data-tui-tabs-value={ p.Value }
+		data-tui-tabs-state={ utils.IfElse(p.IsActive, "active", "inactive") }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</button>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+
+	{{ tabsID := p.TabsID }}
+	if tabsID == "" {
+		{{ tabsID = IDFromContext(ctx) }}
+	}
+
+	if p.Value == "" {
+		<span class="tui-error">Error: Tab Content missing required 'Value'.</span>
+		return templ.NopComponent
+	}
+
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			"tui-tabs__content " +
+			utils.IfElse(p.IsActive, "is-active ", "") +
+			p.Class
+		}
+		data-tui-tabs-content
+		data-tui-tabs-id={ tabsID }
+		data-tui-tabs-value={ p.Value }
+		data-tui-tabs-state={ utils.IfElse(p.IsActive, "active", "inactive") }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+func IDFromContext(ctx context.Context) string {
+	if tabsID, ok := ctx.Value("tabsId").(string); ok {
+		return tabsID
+	}
+	return ""
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/tabs.js?v=" + utils.ScriptVersion }></script>
+}

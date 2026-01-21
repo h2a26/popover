@@ -1,0 +1,22 @@
+package pageheader
+
+type Props struct {
+	Title       string
+	Description string
+}
+
+templ PageHeader(props Props) {
+	<header class="tui-page-header">
+		if props.Title != "" {
+			<h1 class="tui-page-title">
+				{ props.Title }
+			</h1>
+		}
+
+		if props.Description != "" {
+			<p class="tui-page-description">
+				{ props.Description }
+			</p>
+		}
+	</header>
+}

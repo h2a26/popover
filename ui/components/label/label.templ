@@ -1,0 +1,44 @@
+package label
+
+type Props struct {
+    ID         string
+    Class      string
+    Attributes templ.Attributes
+    For        string
+    Error      string
+    Required   bool
+}
+
+func getClasses(p Props) string {
+    classes := "tui-label"
+    if p.Error != "" {
+        classes += " tui-label-error"
+    }
+    if p.Class != "" {
+        classes += " " + p.Class
+    }
+    return classes
+}
+
+templ Label(props ...Props) {
+    {{ p := Props{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    <label
+       if p.ID != "" {
+          id={ p.ID }
+       }
+       if p.For != "" {
+          for={ p.For }
+       }
+       class={ getClasses(p) }
+       data-tui-label-disabled-style
+       { p.Attributes... }
+    >
+       { children... }
+       if p.Required {
+           <span class="tui-label-required"> *</span>
+       }
+    </label>
+}

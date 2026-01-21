@@ -1,0 +1,388 @@
+package dropdown
+
+import (
+	"context"
+	"mpay/ui/components/icon"
+	"mpay/ui/components/popover"
+	"mpay/ui/utils"
+)
+
+/* ------------------------
+   Placement aliases
+------------------------ */
+
+type Placement = popover.Placement
+
+const (
+	PlacementTop         = popover.PlacementTop
+	PlacementTopStart    = popover.PlacementTopStart
+	PlacementTopEnd      = popover.PlacementTopEnd
+	PlacementRight       = popover.PlacementRight
+	PlacementRightStart  = popover.PlacementRightStart
+	PlacementRightEnd    = popover.PlacementRightEnd
+	PlacementBottom      = popover.PlacementBottom
+	PlacementBottomStart = popover.PlacementBottomStart
+	PlacementBottomEnd   = popover.PlacementBottomEnd
+	PlacementLeft        = popover.PlacementLeft
+	PlacementLeftStart   = popover.PlacementLeftStart
+	PlacementLeftEnd     = popover.PlacementLeftEnd
+)
+
+/* ------------------------
+   Context keys
+------------------------ */
+
+type contextKey string
+
+var (
+	contentIDKey    contextKey = "dropdown-content-id"
+	subContentIDKey contextKey = "dropdown-sub-content-id"
+)
+
+/* ------------------------
+   Props
+------------------------ */
+
+type Props struct {
+	ID string
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	HasError   bool
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Placement  Placement
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Disabled     bool
+	Href         string
+	Target       string
+	PreventClose bool
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ShortcutProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SubProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SubTriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SubContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+/* ------------------------
+   Root
+------------------------ */
+
+templ Dropdown(props ...Props) {
+	{{ p := Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, contentIDKey, p.ID) }}
+	<div data-tui-dropdown-wrapper id={ "wrapper-" + p.ID }>
+		{ children... }
+	</div>
+}
+
+/* ------------------------
+   Trigger
+------------------------ */
+
+templ Trigger(props ...TriggerProps) {
+	{{ p := TriggerProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ contentID, _ := ctx.Value(contentIDKey).(string) }}
+	{{ classStr := "tui-dropdown-trigger " + p.Class }}
+	if p.HasError {
+		{{ classStr += " tui-input-error" }}
+	}
+	@popover.Trigger(popover.TriggerProps{
+		ID:          p.ID,
+		For:         contentID,
+		TriggerType: popover.TriggerTypeClick,
+		Class:       classStr,
+		Attributes:  p.Attributes,
+	}) {
+		<span class="tui-dropdown-trigger-label" data-tui-dropdown-trigger-label>
+			{ children... }
+		</span>
+		<span class="tui-dropdown-trigger-icon" aria-hidden="true">
+			@icon.ChevronDown(icon.Props{Size: 20})
+		</span>
+	}
+}
+
+/* ------------------------
+   Content
+------------------------ */
+
+templ Content(props ...ContentProps) {
+	{{ p := ContentProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ contentID, _ := ctx.Value(contentIDKey).(string) }}
+	if p.Placement == "" {
+		{{ p.Placement = PlacementBottomStart }}
+	}
+	@popover.Content(popover.ContentProps{
+		ID:         contentID,
+		Placement:  p.Placement,
+		Exclusive:  true,
+		Class:      "tui-dropdown-content " + p.Class,
+		Attributes: p.Attributes,
+	}) {
+		<div class="tui-dropdown-menu" role="menu">
+			{ children... }
+		</div>
+	}
+}
+
+/* ------------------------
+   Group
+------------------------ */
+
+templ Group(props ...GroupProps) {
+	{{ p := GroupProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-dropdown-group " + p.Class }
+		role="group"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+/* ------------------------
+   Label
+------------------------ */
+
+templ Label(props ...LabelProps) {
+	{{ p := LabelProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-dropdown-label " + p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+/* ------------------------
+   Item
+------------------------ */
+
+templ Item(props ...ItemProps) {
+	{{ p := ItemProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.Href != "" {
+		<a
+			id={ p.ID }
+			href={ templ.SafeURL(p.Href) }
+			if p.Target != "" {
+				target={ p.Target }
+			}
+			class={ "tui-dropdown-item " + p.Class }
+			role="menuitem"
+			aria-disabled?={ p.Disabled }
+			data-tui-dropdown-item
+			if p.PreventClose {
+				data-tui-dropdown-prevent-close="true"
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</a>
+	}
+	if p.Href == "" {
+		<button
+			id={ p.ID }
+			type="button"
+			class={ "tui-dropdown-item " + p.Class }
+			role="menuitem"
+			disabled?={ p.Disabled }
+			data-tui-dropdown-item
+			if p.PreventClose {
+				data-tui-dropdown-prevent-close="true"
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</button>
+	}
+}
+
+/* ------------------------
+   Shortcut
+------------------------ */
+
+templ Shortcut(props ...ShortcutProps) {
+	{{ p := ShortcutProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-dropdown-shortcut " + p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+/* ------------------------
+   Separator
+------------------------ */
+
+templ Separator(props ...SeparatorProps) {
+	{{ p := SeparatorProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ "tui-dropdown-separator " + p.Class }
+		role="separator"
+		{ p.Attributes... }
+	></div>
+}
+
+/* ------------------------
+   Submenu
+------------------------ */
+
+templ Sub(props ...SubProps) {
+	{{ p := SubProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, subContentIDKey, p.ID) }}
+	<div
+		class={ "tui-dropdown-sub " + p.Class }
+		data-tui-dropdown-submenu
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ SubTrigger(props ...SubTriggerProps) {
+	{{ p := SubTriggerProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ subID, _ := ctx.Value(subContentIDKey).(string) }}
+	@popover.Trigger(popover.TriggerProps{
+		ID:          p.ID,
+		For:         subID,
+		TriggerType: popover.TriggerTypeHover,
+	}) {
+		<button
+			type="button"
+			class={ "tui-dropdown-item tui-dropdown-sub-trigger " + p.Class }
+			data-tui-dropdown-submenu-trigger
+			{ p.Attributes... }
+		>
+			<span>
+				{ children... }
+			</span>
+			<span class="tui-dropdown-sub-arrow">›</span>
+		</button>
+	}
+}
+
+templ SubContent(props ...SubContentProps) {
+	{{ p := SubContentProps{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ subID, _ := ctx.Value(subContentIDKey).(string) }}
+	@popover.Content(popover.ContentProps{
+		ID:            subID,
+		Placement:     PlacementRightStart,
+		HoverDelay:    100,
+		HoverOutDelay: 200,
+		Class:         "tui-dropdown-content " + p.Class,
+		Attributes:    p.Attributes,
+	}) {
+		<div class="tui-dropdown-menu" role="menu">
+			{ children... }
+		</div>
+	}
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/dropdown.js?v=" + utils.ScriptVersion }></script>
+}

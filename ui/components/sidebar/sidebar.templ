@@ -1,0 +1,138 @@
+package sidebar
+
+import (
+	"mpay/ui/components/icon"
+	"mpay/ui/handlers/url"
+	"mpay/ui/utils"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Collapsed  bool
+	Attributes templ.Attributes
+}
+
+templ Sidebar(currentPath string) {
+	@SidebarCom(Props{
+		Class: "app-sidebar",
+	}) {
+		@Header() {
+			<div class="sidebar-logo">
+				<svg width="228" height="76" viewBox="0 0 228 76" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<rect width="228" height="76" fill="url(#pattern0_60676_76975)"></rect>
+					<defs>
+						<pattern id="pattern0_60676_76975" patternContentUnits="objectBoundingBox" width="1" height="1">
+							<use xlink:href="#image0_60676_76975" transform="matrix(0.00653595 0 0 0.0196078 0 0.0980392)"></use>
+						</pattern>
+						<image id="image0_60676_76975" width="153" height="41" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"></image>
+					</defs>
+				</svg>
+			</div>
+		}
+		@Separator()
+		@Profile("Alex",
+			"alex@gmail.com",
+		)
+		@Content() {
+			@Menu() {
+				@MenuGroup("") {
+					@MenuItem(url.Customer_ListPage, currentPath) {
+						<span class="sidebar-icon">
+							@icon.Users(icon.Props{Size: 20})
+						</span>
+						Users
+					}
+				}
+			}
+		}
+	}
+}
+
+templ SidebarCom(props ...Props) {
+	{{ p := Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<aside
+		id={ p.ID }
+		data-sidebar
+		{ p.Attributes... }
+	>
+		{ children... }
+	</aside>
+}
+
+templ Header() {
+	<div class="tui-sidebar-header">
+		{ children... }
+	</div>
+}
+
+templ Separator() {
+	<div class="tui-sidebar-separator"></div>
+}
+
+templ Content() {
+	<nav class="tui-sidebar-content">
+		{ children... }
+	</nav>
+}
+
+templ Footer() {
+	<div class="tui-sidebar-footer">
+		{ children... }
+	</div>
+}
+
+templ Menu() {
+	<ul class="tui-sidebar-menu">
+		{ children... }
+	</ul>
+}
+
+templ MenuGroup(label string) {
+	<li class="tui-sidebar-group">
+		<span class="tui-sidebar-group-label">{ label }</span>
+		<ul class="tui-sidebar-group-items">
+			{ children... }
+		</ul>
+	</li>
+}
+
+templ MenuItem(href string, currentPath string, children ...any) {
+	{{ active := currentPath == href }}
+	<li class="tui-sidebar-item">
+		<a
+			href={ templ.SafeURL(href) }
+			class={ "tui-sidebar-link", templ.KV("active", active) }
+			if active {
+				aria-current="page"
+			}
+		>
+			{ children... }
+		</a>
+	</li>
+}
+
+templ Profile(name string, email string) {
+	<li class="tui-sidebar-profile">
+		<button type="button" class="tui-profile-button">
+			<span class="tui-profile-avatar">
+				@icon.User(icon.Props{Size: 20})
+			</span>
+			<div class="tui-profile-info">
+				<span class="tui-profile-name">{ name }</span>
+				<span class="tui-profile-email">{ email }</span>
+			</div>
+			<span class="tui-profile-logout">
+				<a href={ url.Root }>
+					@icon.LogOut(icon.Props{Size: 18})
+				</a>
+			</span>
+		</button>
+	</li>
+}

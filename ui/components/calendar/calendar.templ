@@ -1,0 +1,220 @@
+package calendar
+
+import (
+	"mpay/ui/components/icon"
+	"mpay/ui/utils"
+	"strconv"
+	"time"
+)
+
+type LocaleTag string
+
+var (
+	LocaleDefaultTag    = LocaleTag("en-US")
+	LocaleTagChinese    = LocaleTag("zh-CN")
+	LocaleTagFrench     = LocaleTag("fr-FR")
+	LocaleTagGerman     = LocaleTag("de-DE")
+	LocaleTagItalian    = LocaleTag("it-IT")
+	LocaleTagJapanese   = LocaleTag("ja-JP")
+	LocaleTagPortuguese = LocaleTag("pt-PT")
+	LocaleTagSpanish    = LocaleTag("es-ES")
+)
+
+type Day int
+
+var (
+	Sunday    = Day(0)
+	Monday    = Day(1)
+	Tuesday   = Day(2)
+	Wednesday = Day(3)
+	Thursday  = Day(4)
+	Friday    = Day(5)
+	Saturday  = Day(6)
+)
+
+type Props struct {
+	ID                string
+	Class             string
+	LocaleTag         LocaleTag
+	Value             *time.Time
+	Name              string
+	InitialMonth      int
+	InitialYear       int
+	StartOfWeek       *Day
+	RenderHiddenInput bool
+}
+
+templ Calendar(props ...Props) {
+	{{
+		var p Props
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if p.ID == "" {
+			p.ID = utils.RandomID() + "-calendar"
+		}
+		if p.Name == "" {
+			p.Name = p.ID + "-value"
+		}
+		if p.LocaleTag == "" {
+			p.LocaleTag = LocaleDefaultTag
+		}
+
+		initialStartOfWeek := Monday
+		if p.StartOfWeek != nil {
+			initialStartOfWeek = *p.StartOfWeek
+		}
+
+		initialView := time.Now()
+		if p.Value != nil {
+			initialView = *p.Value
+		}
+
+		initialMonth := p.InitialMonth
+		initialYear := p.InitialYear
+
+		if initialYear <= 0 {
+			initialYear = initialView.Year()
+		}
+
+		if initialMonth < 0 || initialMonth > 11 {
+			initialMonth = int(initialView.Month()) - 1
+		}
+
+		initialSelectedISO := ""
+		if p.Value != nil {
+			initialSelectedISO = p.Value.Format("2006-01-02")
+		}
+
+		currentMonth := initialMonth
+		currentYear := initialYear
+
+		monthNames := []string{
+			"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+		}
+	}}
+	<div
+		class={ "tui-calendar " + p.Class }
+		id={ p.ID + "-wrapper" }
+		data-tui-calendar-wrapper
+	>
+		if p.RenderHiddenInput {
+			<input
+				type="hidden"
+				id={ p.ID + "-hidden" }
+				name={ p.Name }
+				value={ initialSelectedISO }
+				data-tui-calendar-hidden-input
+			/>
+		}
+		<div
+			id={ p.ID }
+			class="tui-calendar-container"
+			data-tui-calendar-container
+			data-tui-calendar-locale-tag={ string(p.LocaleTag) }
+			data-tui-calendar-initial-month={ strconv.Itoa(initialMonth) }
+			data-tui-calendar-initial-year={ strconv.Itoa(initialYear) }
+			data-tui-calendar-selected-date={ initialSelectedISO }
+			data-tui-calendar-start-of-week={ int(initialStartOfWeek) }
+		>
+			<!-- Header -->
+			<div class="tui-calendar-header">
+				<button
+					type="button"
+					class="tui-calendar-nav-btn"
+					data-tui-calendar-prev
+				>
+					@icon.ChevronLeft()
+				</button>
+				<div class="tui-calendar-select-group">
+					<!-- Month -->
+					<div class="tui-calendar-select">
+						<select
+							id={ p.ID + "-month-select" }
+							data-tui-calendar-month-select
+							aria-label="Choose month"
+						>
+							for i := 0; i < 12; i++ {
+								<option
+									value={ strconv.Itoa(i) }
+									selected?={ i == currentMonth }
+									data-tui-calendar-month-index={ strconv.Itoa(i) }
+								>
+									{ monthNames[i] }
+								</option>
+							}
+						</select>
+						<span class="tui-calendar-select-value" aria-hidden="true">
+							<span id={ p.ID + "-month-value" }>
+								{ monthNames[currentMonth] }
+							</span>
+							@icon.ChevronDown(icon.Props{Size: 14})
+						</span>
+					</div>
+					<!-- Year -->
+					<div class="tui-calendar-select">
+						<select
+							id={ p.ID + "-year-select" }
+							data-tui-calendar-year-select
+							aria-label="Choose year"
+						>
+							for year := 2100; year >= 1900; year-- {
+								<option
+									value={ strconv.Itoa(year) }
+									selected?={ year == currentYear }
+								>
+									{ strconv.Itoa(year) }
+								</option>
+							}
+						</select>
+						<span class="tui-calendar-select-value" aria-hidden="true">
+							<span id={ p.ID + "-year-value" }>
+								{ strconv.Itoa(currentYear) }
+							</span>
+							@icon.ChevronDown(icon.Props{Size: 14})
+						</span>
+					</div>
+				</div>
+				<button
+					type="button"
+					class="tui-calendar-nav-btn"
+					data-tui-calendar-next
+				>
+					@icon.ChevronRight()
+				</button>
+			</div>
+			<!-- Weekdays -->
+			<div
+				class="tui-calendar-weekdays"
+				data-tui-calendar-weekdays
+			></div>
+			<!-- Days -->
+			<div
+				class="tui-calendar-days"
+				data-tui-calendar-days
+			></div>
+			<!-- Actions -->
+			<div class="tui-calendar-actions">
+				<button
+					type="button"
+					class="tui-calendar-action-btn"
+					data-tui-calendar-today
+				>
+					Today
+				</button>
+				<button
+					type="button"
+					class="tui-calendar-action-btn"
+					data-tui-calendar-clear
+				>
+					Clear
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/calendar.js?v=" + utils.ScriptVersion }></script>
+}

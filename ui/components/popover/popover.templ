@@ -1,0 +1,129 @@
+package popover
+
+import (
+    "mpay/ui/utils"
+	"strconv"
+)
+
+type Placement string
+type TriggerType string
+
+const (
+	PlacementTop         Placement = "top"
+	PlacementTopStart    Placement = "top-start"
+	PlacementTopEnd      Placement = "top-end"
+	PlacementRight       Placement = "right"
+	PlacementRightStart  Placement = "right-start"
+	PlacementRightEnd    Placement = "right-end"
+	PlacementBottom      Placement = "bottom"
+	PlacementBottomStart Placement = "bottom-start"
+	PlacementBottomEnd   Placement = "bottom-end"
+	PlacementLeft        Placement = "left"
+	PlacementLeftStart   Placement = "left-start"
+	PlacementLeftEnd     Placement = "left-end"
+
+	TriggerTypeHover TriggerType = "hover"
+	TriggerTypeClick TriggerType = "click"
+)
+
+type TriggerProps struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	For         string
+	TriggerType TriggerType
+}
+
+type ContentProps struct {
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	Placement        Placement
+	Offset           int
+	DisableClickAway bool
+	DisableESC       bool
+	ShowArrow        bool
+	HoverDelay       int
+	HoverOutDelay    int
+	MatchWidth       bool
+	Exclusive        bool
+}
+
+/* ------------------------
+   Trigger
+------------------------ */
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.TriggerType == "" {
+		{{ p.TriggerType = TriggerTypeClick }}
+	}
+
+	<span
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-popover-trigger " + p.Class }
+		if p.For != "" {
+			data-tui-popover-trigger={ p.For }
+		}
+		data-tui-popover-open="false"
+		data-tui-popover-type={ string(p.TriggerType) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+/* ------------------------
+   Content
+------------------------ */
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Placement == "" {
+		{{ p.Placement = PlacementBottom }}
+	}
+	if p.Offset == 0 {
+		if p.ShowArrow {
+			{{ p.Offset = 8 }}
+		} else {
+			{{ p.Offset = 4 }}
+		}
+	}
+
+	<div
+		id={ p.ID }
+		class={ "tui-popover " + p.Class }
+		data-tui-popover-id={ p.ID }
+		data-tui-popover-open="false"
+		data-tui-popover-placement={ string(p.Placement) }
+		data-tui-popover-offset={ strconv.Itoa(p.Offset) }
+		data-tui-popover-disable-clickaway={ strconv.FormatBool(p.DisableClickAway) }
+		data-tui-popover-disable-esc={ strconv.FormatBool(p.DisableESC) }
+		data-tui-popover-show-arrow={ strconv.FormatBool(p.ShowArrow) }
+		data-tui-popover-hover-delay={ strconv.Itoa(p.HoverDelay) }
+		data-tui-popover-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
+		data-tui-popover-exclusive={ strconv.FormatBool(p.Exclusive) }
+		if p.MatchWidth {
+			data-tui-popover-match-width="true"
+		}
+		{ p.Attributes... }
+	>
+		<div class="tui-popover-content">
+			{ children... }
+		</div>
+
+		if p.ShowArrow {
+			<div data-tui-popover-arrow class="tui-popover-arrow"></div>
+		}
+	</div>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/popover.js?v=" + utils.ScriptVersion }></script>
+}

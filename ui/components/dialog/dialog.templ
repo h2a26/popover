@@ -1,0 +1,277 @@
+package dialog
+
+import (
+	"context"
+	"mpay/ui/components/icon"
+	"mpay/ui/utils"
+)
+
+type contextKey string
+
+const (
+	instanceKey contextKey = "dialogInstance"
+	openKey     contextKey = "dialogOpen"
+)
+
+type Props struct {
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	DisableClickAway bool
+	DisableESC       bool
+	Open             bool
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // Reference to a specific dialog ID (for external triggers)
+}
+
+type ContentProps struct {
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	HideCloseButton  bool
+	Open             bool // Initial open state for standalone usage (when no context)
+	DisableAutoFocus bool
+}
+
+type CloseProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // ID of the dialog to close (optional, defaults to closest dialog)
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type FooterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Dialog(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ instanceID := p.ID }}
+	if instanceID == "" {
+		{{ instanceID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, instanceKey, instanceID) }}
+	{{ ctx = context.WithValue(ctx, openKey, p.Open) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-dialog
+		data-dialog-instance={ instanceID }
+		if p.DisableClickAway {
+			data-tui-dialog-disable-click-away="true"
+		}
+		if p.DisableESC {
+			data-tui-dialog-disable-esc="true"
+		}
+		class={ utils.JoinClasses("", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ instanceID := "" }}
+	// Explicit For prop takes priority over inherited context
+	if p.For != "" {
+		{{ instanceID = p.For }}
+	} else if val := ctx.Value(instanceKey); val != nil {
+		{{ instanceID = val.(string) }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-dialog-trigger={ instanceID }
+		data-dialog-instance={ instanceID }
+		data-tui-dialog-trigger-open="false"
+		class={ utils.JoinClasses("contents", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Start with prop values as defaults
+	{{ instanceID := p.ID }}
+	{{ open := p.Open }}
+	// Override with context values if available
+	if val := ctx.Value(instanceKey); val != nil {
+		{{ instanceID = val.(string) }}
+	}
+	if val := ctx.Value(openKey); val != nil {
+		{{ open = val.(bool) }}
+	}
+	// Apply defaults if still empty
+	if instanceID == "" {
+		{{ instanceID = utils.RandomID() }}
+	}
+	<!-- Overlay -->
+	<div
+		class={ utils.JoinClasses("dialog-backdrop", p.Class) }
+		data-tui-dialog-backdrop
+		data-dialog-instance={ instanceID }
+		if open {
+			data-tui-dialog-open="true"
+		} else {
+			data-tui-dialog-open="false"
+			data-tui-dialog-hidden="true"
+		}
+	></div>
+	<!-- Content -->
+	<div
+		 class={ utils.JoinClasses("dialog-content", p.Class) }
+		data-tui-dialog-content
+		data-dialog-instance={ instanceID }
+		if p.DisableAutoFocus {
+			data-tui-dialog-disable-autofocus="true"
+		}
+		if open {
+			data-tui-dialog-open="true"
+		} else {
+			data-tui-dialog-open="false"
+			data-tui-dialog-hidden="true"
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+		if !p.HideCloseButton {
+			<button
+				class="dialog-close"
+				data-tui-dialog-close={ instanceID }
+				aria-label="Close"
+				type="button"
+			>
+				@icon.X()
+				<span class="sr-only">Close</span>
+			</button>
+		}
+	</div>
+}
+
+templ Close(props ...CloseProps) {
+	{{ var p CloseProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.For != "" {
+			data-tui-dialog-close={ p.For }
+		} else {
+			data-tui-dialog-close
+		}
+		class={ utils.JoinClasses("dialog-close-trigger", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Header(props ...HeaderProps) {
+	{{ var p HeaderProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.JoinClasses("dialog-header", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Footer(props ...FooterProps) {
+	{{ var p FooterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.JoinClasses("dialog-footer", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<h2
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.JoinClasses("dialog-title", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</h2>
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<p
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.JoinClasses("dialog-description", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</p>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/dialog.js?v=" + utils.ScriptVersion }></script>
+}

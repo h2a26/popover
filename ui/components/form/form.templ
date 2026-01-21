@@ -1,0 +1,137 @@
+package form
+
+import (
+    "mpay/ui/components/label"
+)
+
+type MessageVariant string
+
+const (
+    MessageVariantError MessageVariant = "error"
+    MessageVariantInfo  MessageVariant = "info"
+)
+
+type ItemProps struct {
+    ID         string
+    Class      string
+    Attributes templ.Attributes
+}
+
+type LabelProps struct {
+    ID            string
+    Class         string
+    Attributes    templ.Attributes
+    For           string
+    DisabledClass string
+}
+
+type DescriptionProps struct {
+    ID         string
+    Class      string
+    Attributes templ.Attributes
+}
+
+type MessageProps struct {
+    ID         string
+    Class      string
+    Attributes templ.Attributes
+    Variant    MessageVariant
+}
+
+// Internal helper for class concatenation
+func joinClasses(base string, custom string) string {
+    if custom == "" {
+        return base
+    }
+    return base + " " + custom
+}
+
+templ Item(props ...ItemProps) {
+    {{ p := ItemProps{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    <div
+       if p.ID != "" {
+          id={ p.ID }
+       }
+       class={ joinClasses("tui-form-item", p.Class) }
+       { p.Attributes... }
+    >
+       { children... }
+    </div>
+}
+
+templ ItemFlex(props ...ItemProps) {
+    {{ p := ItemProps{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    <div
+       if p.ID != "" {
+          id={ p.ID }
+       }
+       class={ joinClasses("tui-form-item-flex", p.Class) }
+       { p.Attributes... }
+    >
+       { children... }
+    </div>
+}
+
+templ Label(props ...LabelProps) {
+    {{ p := LabelProps{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    @label.Label(label.Props{
+       ID:         p.ID,
+       Class:      p.Class,
+       Attributes: p.Attributes,
+       For:        p.For,
+    }) {
+       { children... }
+    }
+}
+
+templ Description(props ...DescriptionProps) {
+    {{ p := DescriptionProps{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    <p
+       if p.ID != "" {
+          id={ p.ID }
+       }
+       class={ joinClasses("tui-form-description", p.Class) }
+       { p.Attributes... }
+    >
+       { children... }
+    </p>
+}
+
+templ Message(props ...MessageProps) {
+    {{ p := MessageProps{} }}
+    if len(props) > 0 {
+       {{ p = props[0] }}
+    }
+    <p
+       if p.ID != "" {
+          id={ p.ID }
+       }
+       class={ joinClasses("tui-form-message "+messageVariantClass(p.Variant), p.Class) }
+       { p.Attributes... }
+    >
+       { children... }
+    </p>
+}
+
+func messageVariantClass(variant MessageVariant) string {
+    switch variant {
+    case MessageVariantError:
+       return "tui-form-message-error"
+    case MessageVariantInfo:
+       return "tui-form-message-info"
+    default:
+       return ""
+    }
+}

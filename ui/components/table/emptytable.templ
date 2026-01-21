@@ -1,0 +1,28 @@
+package table
+
+import "fmt"
+
+type EmptyTableProps struct {
+	ColumnsCount int
+	Message      string
+}
+
+templ EmptyTable(p EmptyTableProps) {
+	if p.ColumnsCount < 1 {
+		{{ p.ColumnsCount = 1 }}
+	}
+	if p.Message == "" {
+		{{ p.Message = "No data found" }}
+	}
+	@Row() {
+		@CellP(CellProps{
+			Attributes: templ.Attributes{
+				"colspan": fmt.Sprintf("%d", p.ColumnsCount),
+			},
+		}) {
+			<div class="tui-table-empty">
+				{ p.Message }
+			</div>
+		}
+	}
+}

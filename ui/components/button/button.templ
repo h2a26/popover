@@ -1,0 +1,128 @@
+package button
+
+import "strings"
+
+type Variant string
+type Size string
+type Type string
+
+const (
+	VariantDefault     Variant = "default"
+	VariantDestructive Variant = "destructive"
+	VariantOutline     Variant = "outline"
+	VariantSecondary   Variant = "secondary"
+	VariantSuccess     Variant = "success"
+	VariantGhost       Variant = "ghost"
+	VariantLink        Variant = "link"
+)
+
+const (
+	TypeButton Type = "button"
+	TypeReset  Type = "reset"
+	TypeSubmit Type = "submit"
+)
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+	SizeLg      Size = "lg"
+	SizeIcon    Size = "icon"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    Variant
+	Size       Size
+	FullWidth  bool
+	Href       string
+	Target     string
+	Disabled   bool
+	Type       Type
+	Form       string
+}
+
+func (p Props) GetClasses() string {
+	classes := []string{"tui-btn"}
+
+	// Variant
+	switch p.Variant {
+	case VariantDestructive:
+		classes = append(classes, "tui-btn-destructive")
+	case VariantOutline:
+		classes = append(classes, "tui-btn-outline")
+	case VariantSecondary:
+		classes = append(classes, "tui-btn-secondary")
+	case VariantSuccess:
+		classes = append(classes, "tui-btn-success")
+	case VariantGhost:
+		classes = append(classes, "tui-btn-ghost")
+	case VariantLink:
+		classes = append(classes, "tui-btn-link")
+	default:
+		classes = append(classes, "tui-btn-default")
+	}
+
+	// Size
+	switch p.Size {
+	case SizeSm:
+		classes = append(classes, "tui-btn-sm")
+	case SizeLg:
+		classes = append(classes, "tui-btn-lg")
+	case SizeIcon:
+		classes = append(classes, "tui-btn-icon")
+	default:
+		classes = append(classes, "tui-btn-default-size")
+	}
+
+	if p.FullWidth {
+		classes = append(classes, "tui-btn-full")
+	}
+
+	if p.Class != "" {
+		classes = append(classes, p.Class)
+	}
+
+	return strings.Join(classes, " ")
+}
+
+templ Button(props ...Props) {
+	{{ p := Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Type == "" {
+		{{ p.Type = TypeButton }}
+	}
+	if p.Href != "" && !p.Disabled {
+		<a
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			href={ templ.SafeURL(p.Href) }
+			if p.Target != "" {
+				target={ p.Target }
+			}
+			class={ p.GetClasses() }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</a>
+	} else {
+		<button
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			class={ p.GetClasses() }
+			type={ string(p.Type) }
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			disabled?={ p.Disabled }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</button>
+	}
+}

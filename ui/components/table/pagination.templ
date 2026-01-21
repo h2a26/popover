@@ -1,0 +1,89 @@
+package table
+
+import (
+	"fmt"
+	"net/url"
+
+	"mpay/ui/components/pagination"
+)
+
+func buildQuery(page uint, otherParams map[string]string) string {
+	if otherParams == nil {
+		return fmt.Sprintf("?page=%d", page)
+	}
+
+	params := url.Values{}
+	params.Set("page", fmt.Sprintf("%d", page))
+	for k, v := range otherParams {
+		if v != "" {
+			params.Set(k, v)
+		}
+	}
+	return "?" + params.Encode()
+}
+
+templ Pagination(tableID string, p PaginationProp, items []PageItem, otherParams map[string]string) {
+	<tr>
+		<td colspan="100%" class="tui-table-footer-cell">
+			<div class="tui-table-footer-content">
+				<div class="tui-table-footer-left">
+					<div class="tui-table-summary">
+						Show { p.SerialFrom } - { p.SerialTo } record of { p.TotalRecords }
+					</div>
+				</div>
+				<div class="tui-table-footer-center">
+					@pagination.Pagination() {
+						@pagination.Content() {
+							@pagination.Item() {
+								@pagination.Previous(
+									pagination.PreviousProps{
+										Disabled: p.IsFirst(),
+										Attributes: templ.Attributes{
+											"hx-get":    buildQuery(p.CurrentPage-1, otherParams),
+											"hx-target": "#" + tableID,
+											"hx-swap":   "outerHTML",
+										},
+									},
+								)
+							}
+
+							for _, it := range items {
+								@pagination.Item() {
+									if it.IsEllips {
+										<span class="tui-pagination-ellipsis">...</span>
+									} else {
+										@pagination.Link(
+											pagination.LinkProps{
+												IsActive: it.IsActive,
+												Attributes: templ.Attributes{
+													"hx-get":    buildQuery(it.Page, otherParams),
+													"hx-target": "#" + tableID,
+													"hx-swap":   "outerHTML",
+												},
+											},
+										) {
+											{ it.Page }
+										}
+									}
+								}
+							}
+
+							@pagination.Item() {
+								@pagination.Next(
+									pagination.NextProps{
+										Disabled: p.IsLast(),
+										Attributes: templ.Attributes{
+											"hx-get":    buildQuery(p.CurrentPage+1, otherParams),
+											"hx-target": "#" + tableID,
+											"hx-swap":   "outerHTML",
+										},
+									},
+								)
+							}
+						}
+					}
+				</div>
+			</div>
+		</td>
+	</tr>
+}

@@ -1,0 +1,32 @@
+package input
+
+type SelectProps struct {
+    HasErrors bool
+    Attr templ.Attributes
+}
+
+templ Select(id string, name string) {
+    <select id={ id } name={ name } class={ SelectClass(false) }>
+        { children... }
+    </select>
+}
+
+templ SelectP(id string, name string, p SelectProps) {
+    <select id={ id } name={ name } class={ SelectClass(p.HasErrors) } { p.Attr... }>
+        { children... }
+    </select>
+}
+
+templ Option(value string) {
+    <option value={ value }>
+        { children...}
+    </option>
+}
+
+func SelectClass(error bool) string {
+	class := "tui-input tui-input-select"
+    if error {
+        class += " tui-input-error"
+    }
+    return class
+}

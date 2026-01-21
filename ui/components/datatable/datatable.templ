@@ -1,0 +1,215 @@
+package datatable
+
+import (
+	"mpay/ui/components/emptytable"
+	"mpay/ui/components/pagination"
+	"mpay/ui/components/table"
+	"mpay/ui/utils"
+	"fmt"
+	"net/url"
+)
+
+type Column struct {
+	Key   string
+	Label string
+}
+
+type Props struct {
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Data         []map[string]any
+	Columns      []Column
+	Page         int
+	PageSize     int
+	Total        int
+	MaxPages     int
+	QueryParams  map[string]string
+	EmptyMessage string
+}
+
+templ DataTable(props ...Props) {
+	{{ p := Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Defaults
+	if p.ID == "" {
+		{{ p.ID = "datatable-" + utils.RandomID() }}
+	}
+	if p.Page < 1 {
+		{{ p.Page = 1 }}
+	}
+	if p.PageSize < 1 {
+		{{ p.PageSize = 10 }}
+	}
+	if p.MaxPages < 1 {
+		{{ p.MaxPages = 5 }}
+	}
+	if p.EmptyMessage == "" {
+		{{ p.EmptyMessage = "No data found" }}
+	}
+	// helper to build query string preserving page + extra query params
+	{{
+		buildQuery := func(page int) string {
+			params := url.Values{}
+			params.Set("page", fmt.Sprintf("%d", page))
+			for k, v := range p.QueryParams {
+				if v != "" {
+					params.Set(k, v)
+				}
+			}
+			return "?" + params.Encode()
+		}
+	}}
+	{{
+		formatCell := func(v any) string {
+			switch n := v.(type) {
+			case float64:
+				return fmt.Sprintf("%.0f", n)
+			case float32:
+				return fmt.Sprintf("%.0f", n)
+			default:
+				return fmt.Sprintf("%v", v)
+			}
+		}
+	}}
+	<div
+		id={ p.ID }
+		class={ "tui-datatable " + p.Class }
+		{ p.Attributes... }
+		hx-target="this"
+		hx-swap="outerHTML"
+	>
+		@table.Table(table.Props{ID: p.ID + "-table"}) {
+			/* ================= HEADER ================= */
+			@table.Header() {
+				@table.Row() {
+					for _, col := range p.Columns {
+						@table.Head() {
+							{ col.Label }
+						}
+					}
+				}
+			}
+			/* ================= BODY ================= */
+			@table.Body() {
+				{{ totalRows := p.Total }}
+				{{ start := (p.Page - 1) * p.PageSize }}
+				{{ end := start + len(p.Data) }}
+				if end > totalRows {
+					{{ end = totalRows }}
+				}
+				// EMPTY STATE
+				if len(p.Data) == 0 {
+					@emptytable.EmptyTable(emptytable.Props{
+						ColumnsCount: len(p.Columns),
+						Message:      p.EmptyMessage,
+					})
+				} else {
+					// NORMAL ROWS
+					for _, row := range p.Data {
+						@table.Row() {
+							for _, col := range p.Columns {
+								@table.Cell() {
+									{ formatCell(row[col.Key]) }
+								}
+							}
+						}
+					}
+				}
+			}
+			/* ================= FOOTER ================= */
+			@table.Footer() {
+				{{ totalRows := p.Total }}
+				{{ totalPages := (totalRows + p.PageSize - 1) / p.PageSize }}
+				if totalPages > 1 {
+					<tr>
+						<td colspan="100%" class="tui-table-footer-cell">
+							<div class="tui-table-footer-content">
+								<!-- LEFT -->
+								<div class="tui-table-footer-left">
+									<div class="tui-table-summary">
+										{{ from := (p.Page-1)*p.PageSize + 1 }}
+										{{ to := (p.Page-1)*p.PageSize + len(p.Data) }}
+										Show { fmt.Sprintf("%d", from) } – { fmt.Sprintf("%d", to) }
+										record of { fmt.Sprintf("%d", totalRows) }
+									</div>
+								</div>
+								<!-- CENTER -->
+								<div class="tui-table-footer-center">
+									@pagination.Pagination(
+										pagination.Props{ID: p.ID + "-pagination"},
+									) {
+										@pagination.Content() {
+											<!-- Previous -->
+											@pagination.Item() {
+												@pagination.Previous(
+													pagination.PreviousProps{
+														Href:     buildQuery(p.Page - 1),
+														Disabled: p.Page <= 1,
+														Attributes: templ.Attributes{
+															"hx-get":    buildQuery(p.Page - 1),
+															"hx-target": "#" + p.ID,
+															"hx-swap":   "outerHTML",
+														},
+													},
+												)
+											}
+											<!-- Windowed pagination -->
+											{{ maxItems := p.MaxPages }}
+											{{ startPage := p.Page - maxItems/2 }}
+											{{ endPage := startPage + maxItems - 1 }}
+											if startPage < 1 {
+												{{ startPage = 1 }}
+												{{ endPage = maxItems }}
+											}
+											if endPage > totalPages {
+												{{ endPage = totalPages }}
+												{{ startPage = endPage - maxItems + 1 }}
+												if startPage < 1 {
+													{{ startPage = 1 }}
+												}
+											}
+											for i := startPage; i <= endPage; i++ {
+												@pagination.Item() {
+													@pagination.Link(
+														pagination.LinkProps{
+															Href:     buildQuery(i),
+															IsActive: i == p.Page,
+															Attributes: templ.Attributes{
+																"hx-get":    buildQuery(i),
+																"hx-target": "#" + p.ID,
+																"hx-swap":   "outerHTML",
+															},
+														},
+													) {
+														{ fmt.Sprintf("%d", i) }
+													}
+												}
+											}
+											<!-- Next -->
+											@pagination.Item() {
+												@pagination.Next(
+													pagination.NextProps{
+														Href:     buildQuery(p.Page + 1),
+														Disabled: p.Page >= totalPages,
+														Attributes: templ.Attributes{
+															"hx-get":    buildQuery(p.Page + 1),
+															"hx-target": "#" + p.ID,
+															"hx-swap":   "outerHTML",
+														},
+													},
+												)
+											}
+										}
+									}
+								</div>
+							</div>
+						</td>
+					</tr>
+				}
+			}
+		}
+	</div>
+}

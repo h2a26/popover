@@ -1,0 +1,9 @@
+package indicator
+
+import (
+    "mpay/ui/components/icon"
+)
+
+templ Loading() {
+    @icon.LoaderCircle(icon.Props{ StrokeWidth: "3", Class: "indicator-loading htmx-indicator" })
+}

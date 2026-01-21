@@ -1,0 +1,18 @@
+package alert
+
+templ InfoForm(visible bool, message string) {
+    if visible {
+        <div class="alert alert-form alert-info">
+            { message }
+        </div>
+    }
+}
+
+templ ErrorForm(visible bool, message string) {
+    if visible {
+        <div class="alert alert-form alert-danger">
+            { message }
+        </div>
+    }
+}
+

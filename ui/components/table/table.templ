@@ -1,0 +1,145 @@
+package table
+
+type Props struct {
+	ID            string
+	Class         string
+    RoundedBottom bool
+	Attributes    templ.Attributes
+}
+
+templ Table(p Props) {
+    {{ roundedBottom := "" }}
+    if p.RoundedBottom {
+        {{ roundedBottom = "rounded-bottom" }}
+    }
+	<div class={ "tui-table-wrapper", roundedBottom }>
+        <table id={ p.ID } class={ "tui-table", p.Class } 
+            { p.Attributes... }>
+            { children...}
+        </table>
+    </div>
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Header() {
+    <thead class="tui-table-head">
+        { children...} 
+    </thead>
+}
+
+templ HeaderP(p HeaderProps) {
+	<thead
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-table-head", p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</thead>
+}
+
+type BodyProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Body() {
+    <tbody class="tui-table-body">
+        { children... }
+    </tbody>
+}
+
+templ BodyP(p BodyProps) {
+	<tbody
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-table-body", p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</tbody>
+}
+
+templ Footer() {
+    <div class="tui-table-footer">
+        { children... }
+    </div>
+}
+
+type RowProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Selected   bool
+}
+
+templ Row() {
+    <tr class="tui-table-row">
+        { children... }
+    </tr>
+}
+
+templ RowP(p RowProps) {
+	<tr
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-table-row", templ.KV("is-selected", p.Selected), p.Class }
+		if p.Selected { data-tui-table-state-selected }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</tr>
+}
+
+type HeadProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Head() {
+    <th class="tui-table-th">
+        { children... }
+    </th>
+}
+
+templ HeadP(p HeadProps) {
+	<th
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-table-th", p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</th>
+}
+
+type CellProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Cell() {
+    <td class="tui-table-td">
+        { children... }
+    </td>
+}
+
+templ CellP(p CellProps) {
+	<td
+		if p.ID != "" { id={ p.ID } }
+		class={ "tui-table-td", p.Class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</td>
+}
+
+templ Caption() {
+	<caption class="tui-table-caption">
+		{ children... }
+	</caption>
+}

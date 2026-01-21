@@ -1,0 +1,144 @@
+package input
+
+import (
+	"mpay/ui/components/icon"
+	"mpay/ui/utils"
+)
+
+type Type string
+
+const (
+	TypeText     Type = "text"
+	TypePassword Type = "password"
+	TypeEmail    Type = "email"
+	TypeNumber   Type = "number"
+	TypeTel      Type = "tel"
+	TypeURL      Type = "url"
+	TypeSearch   Type = "search"
+	TypeDate     Type = "date"
+	TypeDateTime Type = "datetime-local"
+	TypeTime     Type = "time"
+	TypeFile     Type = "file"
+	TypeColor    Type = "color"
+	TypeWeek     Type = "week"
+	TypeMonth    Type = "month"
+	TypeHidden   Type = "hidden"
+)
+
+type Props struct {
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	Name             string
+	Type             Type
+	Form             string
+	Placeholder      string
+	Value            string
+	Disabled         bool
+	Readonly         bool
+	Required         bool
+	FileAccept       string
+	HasError         bool
+	NoTogglePassword bool
+}
+
+func getClasses(p Props) string {
+	res := "tui-input"
+	if p.HasError {
+		res += " tui-input-error"
+	}
+	if p.Type == TypePassword && !p.NoTogglePassword {
+		res += " tui-input-password"
+	}
+	if p.Class != "" {
+		res += " " + p.Class
+	}
+	return res
+}
+
+templ Input(props ...Props) {
+	{{ p := Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Type == "" {
+		{{ p.Type = TypeText }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.Type == TypeFile {
+		<input
+			id={ p.ID }
+			type="file"
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			if p.FileAccept != "" {
+				accept={ p.FileAccept }
+			}
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			disabled?={ p.Disabled }
+			readonly?={ p.Readonly }
+			if p.HasError {
+				aria-invalid="true"
+			}
+			class={ getClasses(p) }
+			if p.Required {
+				{ "required" }
+			}
+			{ p.Attributes... }
+		/>
+		{{ return }}
+	}
+	<div class="tui-input-container">
+		<input
+			id={ p.ID }
+			type={ string(p.Type) }
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			if p.Placeholder != "" {
+				placeholder={ p.Placeholder }
+			}
+			if p.Value != "" {
+				value={ p.Value }
+			}
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			disabled?={ p.Disabled }
+			readonly?={ p.Readonly }
+			if p.HasError {
+				aria-invalid="true"
+			}
+			class={ getClasses(p) }
+			if p.Required {
+				{ "required" }
+			}
+			{ p.Attributes... }
+		/>
+		// Password toggle button (only for password types)
+		if p.Type == TypePassword && !p.NoTogglePassword {
+			<button
+				type="button"
+				class="tui-password-toggle"
+				data-tui-input-toggle-password={ p.ID }
+				aria-label="Toggle password visibility"
+			>
+				<span class="icon-closed">
+					@icon.EyeOff(icon.Props{Size: 18})
+				</span>
+				<span class="icon-open hidden">
+					@icon.Eye(icon.Props{Size: 18})
+				</span>
+			</button>
+		}
+	</div>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/assets/js/input.js?v=" + utils.ScriptVersion }></script>
+}
