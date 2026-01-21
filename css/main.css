@@ -1,0 +1,2297 @@
+:root {
+    /* Radius System */
+    --radius: 0.625rem;
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+
+    /* Typography */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-size-content: 0.875rem;
+
+    --color-red-300: oklch(80.8% .114 19.571);
+    --color-red-400: oklch(70.4% .191 22.216);
+    --color-red-500: oklch(63.7% .237 25.331);
+    --color-red-700: oklch(50.5% .213 27.518);
+
+    --color-green-300: oklch(87.1% .15 154.449);
+    --color-green-400: oklch(79.2% .209 151.711);
+    --color-green-700: oklch(52.7% .154 150.069);
+
+    /* Semantic Tokens - Light Mode */
+    --app-background: #F9FAFB;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+
+    --primary: #124F91;
+    --primary-foreground: oklch(0.985 0 0);
+
+    --primary-light: #C5DCF7;
+
+    --secondary: #C5DCF7;
+    --secondary-foreground: oklch(0.985 0 0);
+
+    --success: #5CB747;
+    --success-foreground: oklch(0.985 0 0);
+
+    --bg-pending: #FBF3AD;
+
+    --red: #F40F22;
+
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-color: var(--border);
+}
+
+html {
+    scroll-behavior: smooth;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Margin Utilities */
+.mb-4 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-4 {
+    margin-top: 2rem !important;
+}
+
+.pl-4 {
+    padding-left: 1rem !important;
+}
+
+.w-24 {
+    width: 24% !important;
+}
+
+.w-35 {
+    width: 35% !important;
+}
+
+.w-50 {
+    width: 50% !important;
+}
+
+.w-90 {
+    width: 90% !important;
+}
+
+.h-24 {
+    height: 6rem !important;
+}
+
+.h-32 {
+    height: 8rem !important;
+}
+
+
+/* =========================================================
+   APP LAYOUT
+========================================================= */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--app-background);
+}
+
+.sidebar-container {
+    flex-shrink: 0;
+    padding: 8px;
+    background-color: var(--background);
+    border-right: 1px solid var(--border);
+
+    /* Only round right side */
+    border-top-right-radius: var(--radius-xl);
+    border-bottom-right-radius: var(--radius-xl);
+
+    box-shadow: 4px 0px 8px rgb(0 0 0 / 0.1);
+    overflow: auto;
+}
+
+
+.content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevents flex items from overflowing */
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    padding: 0.3rem;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+.tui-sidebar {
+    width: 280px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    color: var(--foreground);
+    background-color: var(--background);
+}
+
+.tui-sidebar-header {
+    padding: 1.25rem;
+}
+
+.tui-sidebar-separator {
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.tui-sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.tui-sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.tui-sidebar-group-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
+}
+
+.tui-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tui-sidebar-link:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.tui-sidebar-link.active {
+    background-color: var(--primary);
+    color: var(--background);
+}
+
+/* =========================
+   SIDEBAR PROFILE
+========================= */
+
+.tui-sidebar-profile {
+    padding: 0.5rem; /* Add spacing so border-radius is visible */
+}
+
+.tui-profile-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--accent);
+    color: var(--accent-foreground);
+    border: 1px solid var(--border);
+    transition: background 0.2s;
+    overflow: hidden; /* Ensures content clips to border-radius */
+}
+
+/* Avatar */
+.tui-profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    flex-shrink: 0;
+}
+
+/* Profile info stacked vertically */
+.tui-profile-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    align-items: start;
+}
+
+.tui-profile-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.tui-profile-email {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.tui-profile-logout {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    cursor: pointer;
+}
+
+.tui-profile-logout:hover {
+    color: var(--color-red-500);
+}
+
+/* =========================================================
+   SIDEBAR MENU
+========================================================= */
+
+.tui-sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.tui-sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem; /* Tighter gap for professional look */
+}
+
+/* Menu group */
+.tui-sidebar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.tui-sidebar-group-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 0.5rem;
+    padding-bottom: 0.2rem;
+    color: var(--muted-foreground);
+}
+
+/* Menu item link */
+.tui-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover state */
+.tui-sidebar-link:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* Active state */
+.tui-sidebar-link.active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+}
+
+/* Icon wrapper */
+.tui-sidebar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+/* Active icon emphasis */
+.tui-sidebar-link.active .tui-sidebar-icon {
+    opacity: 1;
+}
+
+/* =========================================================
+   SIDEBAR FOOTER
+========================================================= */
+
+.tui-sidebar-footer {
+    padding: 0.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+.tui-page-header {
+    margin-bottom: 1rem;
+}
+
+.tui-page-title {
+    font-size: 1.75rem;
+    line-height: 1.3;
+    color: var(--primary);
+}
+
+.tui-page-description {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+
+/* =========================================================
+   PAGE CONTENT (Card-based Layout)
+========================================================= */
+.page-content {
+    flex: 1;
+    min-height: 0;
+    padding: 1.2rem;
+    color: var(--foreground);
+    /*  border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);*/
+    overflow: auto;
+}
+
+.page-text {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+/* =========================================================
+   TUI COMPONENTS: LABELS & FORM SPACING
+========================================================= */
+.tui-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: var(--foreground);
+}
+
+.tui-label-error {
+    color: var(--color-red-500);
+}
+
+.tui-label-required {
+    color: var(--color-red-500);
+}
+
+.tui-alert {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-top: 1rem;
+}
+
+.tui-alert-error {
+    background: #fdecea;
+    color: var(--color-red-700);
+    border: 1px solid #f5c2c7;
+}
+
+/* Form Items using gap instead of lobotomized owl for better Flex support */
+.tui-form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 5rem;
+}
+
+.tui-form-item-flex {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tui-form-description {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+.tui-form-message {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.tui-form-message-error {
+    color: var(--color-red-500);
+}
+
+.tui-form-message-info {
+    color: var(--primary);
+}
+
+.tui-form {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+}
+
+.tui-form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tui-form-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* =========================================================
+   TWO COLUMN FLEX LAYOUT
+========================================================= */
+
+.tui-flex-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+/* Fixed-width columns */
+.tui-flex-col {
+    flex: 0 0 480px;
+}
+
+.tui-flex-col-600 {
+    flex: 0 0 600px;
+}
+
+/* =========================================================
+   CONFIRMATION CARD
+========================================================= */
+
+.tui-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+/* Big centered range */
+.tui-confirm-range {
+    text-align: center;
+}
+
+.tui-confirm-range-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.02em;
+}
+
+.tui-confirm-range-label {
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+}
+
+/* Divider */
+.tui-confirm-divider {
+    border: none;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-top: 4px dashed var(--border);
+}
+
+.tui-confirm-divider.no-margin {
+    margin-top: 0;
+}
+
+/* Summary section */
+.tui-confirm-summary {
+    margin-top: 1rem;
+    display: flex;
+    gap: 3rem;
+}
+
+.tui-confirm-summary-item {
+    flex: 1;
+}
+
+.tui-confirm-summary-label {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.25rem;
+}
+
+.tui-confirm-summary-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.tui-confirm-summary-value-range {
+    text-align: left;
+    display: block;
+    padding-left: 0.2rem;
+}
+
+.tui-confirm-summary-value-range ul {
+    padding-left: 1rem;
+}
+
+.tui-confirm-summary-value-range li {
+    margin-bottom: 0.25rem;
+}
+
+
+/* =========================================================
+   INPUT Component
+========================================================= */
+
+.tui-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.tui-input {
+    display: flex;
+    height: 2.25rem; /* h-9 */
+    width: 100%;
+    min-width: 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--input);
+    background-color: var(--background);
+    padding: 0.25rem 0.75rem;
+    font-size: 1rem;
+    color: var(--foreground);
+    line-height: 1.25rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Responsive font size for better UX on mobile vs desktop */
+@media (min-width: 768px) {
+    .tui-input {
+        font-size: 0.875rem;
+    }
+}
+
+.tui-input[readonly] {
+    background-color: var(--input);
+    cursor: default;
+}
+
+.tui-input::placeholder {
+    color: var(--muted-foreground);
+}
+
+/* Focus Styles - Using the new --ring token */
+.tui-input:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+}
+
+/* Disabled Styles */
+.tui-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background-color: var(--muted);
+}
+
+/* Error / Invalid Styles - Linked to --color-red-500 */
+.tui-input[aria-invalid="true"],
+.tui-input-error {
+    border-color: var(--color-red-500);
+}
+
+.tui-input[aria-invalid="true"]:focus-visible,
+.tui-input-error:focus-visible {
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-red-500);
+}
+
+/* File Input Styles */
+.tui-input::file-selector-button {
+    border: 0;
+    background-color: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+/* Password Toggle Button */
+.tui-input-password {
+    padding-right: 2.5rem;
+}
+
+.tui-password-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    transition: color 0.2s;
+}
+
+.tui-password-toggle:hover {
+    color: var(--foreground);
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="" data-lucide="icon"><path d="m6 9 6 6 6-6"></path></svg>');
+    background-repeat: no-repeat;
+    background-size: 20px;
+    background-position: right 14px center;
+}
+
+.tui-input.tui-input-select {
+    padding-right: 32px;
+}
+
+/* =========================================================
+   BUTTON BASE
+========================================================= */
+
+.tui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid transparent;
+    outline: none;
+    text-decoration: none;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.tui-btn-full {
+    display: flex;
+    width: 100%;
+}
+
+
+.tui-btn:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.tui-btn svg {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Focus Ring for Buttons */
+.tui-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+}
+
+/* =========================
+   Button Sizes
+========================= */
+
+.tui-btn-sm {
+    height: 2rem;
+    padding: 0 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.tui-btn-default-size {
+    height: 2.25rem; /* h-9 */
+    padding: 0 1rem;
+    width: 10rem;
+}
+
+.tui-btn-lg {
+    height: 2.75rem; /* h-11 */
+    padding: 0 1.5rem;
+    font-size: 1rem;
+}
+
+.tui-btn-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+}
+
+/* =========================
+   BUTTON VARIANTS (Semantic Mapping)
+========================= */
+
+/* Primary / Default */
+.tui-btn-default {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.tui-btn-default:hover {
+    background-color: color-mix(in oklch, var(--primary) 90%, black);
+}
+
+.tui-btn-secondary {
+    background-color: var(--secondary);
+    color: var(--primary);
+}
+
+.tui-btn-secondary:hover {
+    background-color: color-mix(in oklch, var(--muted) 80%, black);
+}
+
+.tui-btn-success {
+    background-color: var(--success);
+    color: var(--success-foreground);
+}
+
+.tui-btn-success:hover {
+    background-color: color-mix(in oklch, var(--muted) 80%, black);
+}
+
+/* Destructive / Danger */
+.tui-btn-destructive {
+    background-color: var(--color-red-500);
+    color: var(--primary-foreground); /* Usually high contrast white */
+}
+
+.tui-btn-destructive:hover {
+    background-color: color-mix(in oklch, var(--color-red-500) 90%, black);
+}
+
+.tui-btn-destructive:focus-visible {
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-red-500);
+}
+
+/* Outline */
+.tui-btn-outline {
+    background-color: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.tui-btn-outline:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* Ghost */
+.tui-btn-ghost {
+    background-color: transparent;
+    color: var(--foreground);
+}
+
+.tui-btn-ghost:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* Link */
+.tui-btn-link {
+    background-color: transparent;
+    color: var(--primary);
+    border: none;
+    padding: 0;
+    height: auto;
+}
+
+.tui-btn-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+a.tui-btn {
+    text-decoration: none;
+    line-height: normal; /* Fixes vertical alignment in <a> tags */
+}
+
+/* =========================================================
+   TOOLBAR & BUTTON GROUP SPACING
+========================================================= */
+
+.tui-table-toolbar-right {
+    display: flex;
+    align-items: center;
+    /* Use gap instead of margins for perfect spacing */
+    gap: 0.5rem;
+}
+
+/* Also applicable to the Search Action area if you add more buttons there */
+.tui-search-action {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+/* =========================
+   LOGIN PAGE
+========================= */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--muted); /* Uses neutral oklch(0.97 0 0) */
+    padding: 1.5rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--background);
+    padding: 2.5rem;
+    border-radius: var(--radius-xl); /* Softer, larger corners for cards */
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.025em;
+}
+
+.login-header p {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.login-link-alt {
+    font-size: 0.875rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link-alt:hover {
+    text-decoration: underline;
+}
+
+.login-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* Global Hidden Utility */
+.hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   TABLE component
+========================================================= */
+
+.tui-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--background);
+}
+
+.tui-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    color: var(--foreground);
+}
+
+/* =========================
+   Header
+========================= */
+.tui-table-head {
+    background-color: var(--primary-light);
+}
+
+.tui-table-th {
+    height: 3rem;
+    padding: 0 1rem;
+    text-align: left;
+    vertical-align: middle;
+    color: var(--primary);
+    border-bottom: 1px solid var(--primary-light);
+    white-space: nowrap;
+}
+
+/* =========================
+   Body & Rows
+========================= */
+
+.tui-table-row {
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid var(--border);
+}
+
+.tui-table-row:last-child {
+    border-bottom: none;
+}
+
+.tui-table-row:hover {
+    background-color: var(--accent); /* Uses the accent token for hover */
+}
+
+.tui-table-row.is-selected {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* =========================
+   Cells
+========================= */
+
+.tui-table-td {
+    height: 3.5rem; /* Increased slightly for better readability */
+    padding: 0.5rem 1rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    border-bottom: 1px solid var(--border);
+}
+
+.tui-table-row:last-child .tui-table-td {
+    border-bottom: none;
+}
+
+
+.tui-table td:nth-child(8) {
+    text-align: start;
+}
+
+/* =========================
+   Table Footer & Toolbar
+========================= */
+
+.tui-table-summary {
+    font-size: 0.875rem;
+    color: var(--foreground);
+    white-space: nowrap;
+}
+
+.tui-table-subtitle {
+    font-weight: 500;
+    color: var(--muted-foreground);
+}
+
+
+.tui-table-footer {
+    border-top: 1px solid var(--border);
+    background-color: var(--background);
+}
+
+.tui-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+}
+
+.tui-table-footer-content {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    min-height: 3.5rem;
+}
+
+.tui-table-footer-left {
+    justify-self: start;
+    text-align: left;
+}
+
+.tui-table-footer-center {
+    justify-self: center;
+}
+
+.tui-table-footer-right {
+    justify-self: end;
+    text-align: right;
+}
+
+.tui-table-empty {
+    padding: 15rem 1rem;
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+}
+
+
+/* =========================
+   TABLE SEARCH
+========================= */
+
+.tui-table-search {
+    display: grid;
+    /* Responsive layout: stacks on mobile, 4-col on tablet+ */
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: end;
+    margin: 1rem 0;
+}
+
+@media (min-width: 768px) {
+    .tui-table-search {
+        grid-template-columns: 1.5fr 1.5fr 2fr auto;
+    }
+}
+
+.tui-search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.tui-input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tui-input-with-icon svg {
+    position: absolute;
+    left: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    color: var(--muted-foreground);
+    pointer-events: none;
+}
+
+.tui-input-with-icon .tui-input {
+    padding-left: 2.25rem;
+}
+
+.tui-search-action {
+    display: flex;
+    align-items: flex-end;
+}
+
+/* =========================
+   CAPTION
+========================= */
+
+.tui-table-caption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* =========================
+   PAGINATION Component
+========================= */
+
+.tui-pagination {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tui-pagination-content {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tui-pagination-item {
+    display: flex;
+}
+
+/* Pagination Links use Ghost/Outline styles */
+.tui-pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.tui-pagination-link:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.tui-pagination-link.is-active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}
+
+.tui-pagination-prev,
+.tui-pagination-next {
+    gap: 0.25rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.tui-pagination-prev:hover,
+.tui-pagination-next:hover {
+    background-color: var(--accent);
+}
+
+.tui-pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--muted-foreground);
+}
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+
+.tui-calendar {
+    width: 100%;
+    max-width: 16rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: var(--foreground);
+    background-color: transparent;
+    padding: 0.25rem;
+    user-select: none;
+}
+
+/* =========================
+   Header & Nav
+========================= */
+.tui-calendar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.tui-calendar-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem; /* Standardized h-8 */
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    color: var(--foreground);
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.tui-calendar-nav-btn:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* =========================
+   Month / Year Selects
+========================= */
+.tui-calendar-select-group {
+    display: flex;
+    flex: 1;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.tui-calendar-select {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 2rem;
+    padding: 0 0.5rem;
+
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+
+.tui-calendar-select:hover {
+    background-color: var(--accent);
+    border-color: var(--ring);
+}
+
+/* Container - styled to look like your buttons */
+.tui-calendar-select {
+    position: relative;
+    flex: 1;
+    height: 2rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+/* The Ghost - invisible but captures the click */
+.tui-calendar-select select {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* The Beauty - what the user actually sees */
+.tui-calendar-select-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    height: 100%;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    pointer-events: none; /* Critical: allows click to reach the select */
+}
+
+/* =========================
+   Weekdays
+========================= */
+.tui-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 0.5rem;
+}
+
+.tui-calendar-weekdays div {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted-foreground); /* Subtle labels */
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   Days Grid
+========================= */
+
+.tui-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px; /* Minimal gap for clean look */
+}
+
+.tui-calendar-days button[data-tui-calendar-day] {
+    appearance: none;
+    background: transparent;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1; /* Ensures perfect circles/squares */
+    width: 100%;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+/* Hover: Use Accent */
+.tui-calendar-days button[data-tui-calendar-day]:hover:not(.is-disabled) {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+/* Today: Subtle Outline */
+.tui-calendar-days button[data-tui-calendar-today="true"] {
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    font-weight: 700;
+}
+
+/* Selected: High Contrast */
+.tui-calendar-days button[data-tui-calendar-selected="true"] {
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+
+/* Disabled/Outside Month */
+.tui-calendar-days button.is-disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+/* =========================
+   Calendar Action Buttons
+========================= */
+
+.tui-calendar-actions {
+    display: flex;
+    justify-content: space-between; /* Spread buttons apart */
+    margin-top: 0.5rem; /* Space from days grid */
+    gap: 0.25rem; /* Minimal spacing between buttons */
+}
+
+.tui-calendar-action-btn {
+    flex: 1; /* Make buttons equal width */
+    height: 2rem; /* Match day button height visually */
+    border-radius: var(--radius-sm); /* Consistent rounding */
+    border: 1px solid var(--border); /* Match calendar border */
+    background-color: var(--background); /* Match calendar background */
+    color: var(--foreground); /* Match calendar text */
+    font-size: 0.8125rem; /* Slightly smaller text */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tui-calendar-action-btn:hover {
+    background-color: var(--accent); /* Accent on hover */
+    color: var(--accent-foreground); /* Ensure text contrast */
+    border-color: var(--accent); /* Optional highlight */
+}
+
+.tui-calendar-action-btn:active {
+    background-color: var(--primary); /* Pressed state */
+    color: var(--primary-foreground);
+}
+
+.tui-calendar-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   POPOVER Component
+========================================================= */
+
+/* Trigger */
+.tui-popover-trigger {
+    cursor: pointer;
+}
+
+/* Popover container */
+.tui-popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: none;
+
+    /* Updated to use Popover semantic tokens */
+    background-color: var(--background);
+    color: var(--foreground);
+
+    border-radius: var(--radius-lg);
+
+    /* Soft elevation shadow */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    font-size: 0.875rem;
+    pointer-events: auto;
+    outline: none;
+}
+
+/* Animation / Open state */
+.tui-popover[data-tui-popover-open="true"] {
+    display: block;
+    animation: tui-popover-in 0.15s ease-out;
+}
+
+@keyframes tui-popover-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Inner content */
+.tui-popover-content {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   Arrow
+--------------------------------------------------------- */
+
+.tui-popover-arrow {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: var(--background); /* Match container */
+    border: 1px solid var(--border);
+    transform: rotate(45deg);
+    z-index: -1; /* Place behind content to hide inner half */
+}
+
+/* Placement-specific Arrow Adjustments */
+
+/* Top */
+.tui-popover[data-tui-popover-placement^="top"] .tui-popover-arrow {
+    bottom: -4px;
+    border-top: none;
+    border-left: none;
+}
+
+/* Bottom */
+.tui-popover[data-tui-popover-placement^="bottom"] .tui-popover-arrow {
+    top: -4px;
+    border-bottom: none;
+    border-right: none;
+}
+
+/* Left */
+.tui-popover[data-tui-popover-placement^="left"] .tui-popover-arrow {
+    right: -4px;
+    border-left: none;
+    border-bottom: none;
+}
+
+/* Right */
+.tui-popover[data-tui-popover-placement^="right"] .tui-popover-arrow {
+    left: -4px;
+    border-right: none;
+    border-top: none;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.tui-card {
+    width: 100%;
+    background-color: var(--background);
+    color: var(--foreground);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    /* Use a slightly more modern, layered shadow */
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+/* -------------------------
+   Card Sub-components
+------------------------- */
+
+.tui-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1.5rem;
+}
+
+.tui-card-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: var(--primary);
+    margin: 0;
+}
+
+.tui-card-description {
+    font-size: 0.875rem;
+    color: var(--muted-foreground); /* Refactored from --muted blue */
+    margin-top: 0.5rem;
+}
+
+.tui-card-content {
+    padding: 1.5rem;
+}
+
+.tui-card-footer {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* =========================================================
+   DATEPICKER Component
+========================================================= */
+
+.tui-datepicker {
+    position: relative;
+    display: inline-block;
+}
+
+/* Trigger button - Mimics .tui-input */
+.tui-datepicker-trigger {
+    width: 100%;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    font-size: 0.875rem;
+    background-color: var(--background);
+    border: 1px solid var(--input);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+/* Hover & Focus */
+.tui-datepicker-trigger:hover {
+    background-color: var(--accent);
+}
+
+.tui-datepicker-trigger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+    border-color: var(--ring);
+}
+
+/* Error state mapping to Destructive */
+.tui-datepicker-trigger.is-error {
+    border-color: var(--color-red-500);
+}
+
+.tui-datepicker-trigger.is-error:focus-visible {
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-red-500);
+}
+
+/* Display text styling */
+.tui-datepicker-display {
+    flex: 1;
+    text-align: left;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Placeholder state for datepicker */
+.tui-datepicker-display:empty::before {
+    content: "Select date...";
+    color: var(--muted-foreground);
+}
+
+/* Calendar Icon */
+.tui-datepicker-icon {
+    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    color: var(--muted-foreground);
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Logic for cleaning up card inside popover */
+.tui-datepicker-popover .tui-card {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* =========================================================
+   Alerts (page and form levels)
+========================================================= */
+
+.alert {
+    display: block;
+    position: relative;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    gap: 0.75rem;
+    text-align: left;
+    border-radius: var(--radius-md);
+}
+
+.alert-form {
+    padding: 0.65rem;
+    font-size: 0.875rem;
+}
+
+.alert-info {
+    color: var(--color-green-700);
+    background-color: var(--color-green-300);
+    border: 1px solid var(--color-green-400);
+}
+
+.alert-danger {
+    color: var(--color-red-700);
+    background-color: var(--color-red-300);
+    border: 1px solid var(--color-red-400);
+}
+
+/* =========================================================
+   Indicators (both HTMX and Templ components)
+========================================================= */
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request.htmx-indicator,
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+.indicator-loading {
+    display: inline;
+    animation: spin 1.4s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================
+   Trigger
+========================= */
+
+.tui-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    cursor: pointer;
+}
+
+/* Trigger label */
+.tui-dropdown-trigger-label {
+    flex: 1;
+    min-width: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Trigger icon */
+.tui-dropdown-trigger-icon {
+    display: inline-flex;
+    align-items: center;
+
+    color: #6b7280; /* gray-500 */
+    transition: transform 0.15s ease;
+}
+
+/* Rotate icon when open */
+.tui-dropdown-trigger[aria-expanded="true"]
+.tui-dropdown-trigger-icon {
+    transform: rotate(180deg);
+}
+
+/* =========================
+   Content container
+========================= */
+
+.tui-dropdown-content {
+    width: 18%;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+
+    padding: 0.25rem;
+
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+    z-index: 50;
+}
+
+/* Menu */
+.tui-dropdown-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   Group
+========================= */
+
+.tui-dropdown-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   Label
+========================= */
+
+.tui-dropdown-label {
+    padding: 0.375rem 0.625rem;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+
+    user-select: none;
+}
+
+/* =========================
+   Item
+========================= */
+
+.tui-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+
+    font-size: 0.875rem;
+    color: #111827;
+
+    background: none;
+    border: none;
+    text-align: left;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.tui-dropdown-item:hover {
+    background-color: #f3f4f6;
+}
+
+
+/* Tabs root */
+.tui-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Tabs list = outer pill */
+.tui-tabs__list {
+    display: flex;
+    width: 100%;
+    padding: 4px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--background);
+}
+
+/* Trigger = segment */
+.tui-tabs__trigger {
+    flex: 1;
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--foreground);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Hover (inactive only) */
+.tui-tabs__trigger[data-tui-tabs-state="inactive"]:hover {
+    background: var(--muted);
+}
+
+/* Focus */
+.tui-tabs__trigger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Active tab */
+.tui-tabs__trigger[data-tui-tabs-state="active"] {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+/* Optional: smooth text rendering */
+.tui-tabs__trigger {
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/*error page */
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.error-page h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary);
+}
+
+.error-page p {
+    margin-top: 12px;
+    font-size: 1.1rem;
+    color: var(--muted-foreground);
+}
+
+.capsule-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.capsule-tab-button {
+    color: var(--foreground);
+    background-color: var(--app-background);
+    border-radius: var(--radius-md);
+    border-style: none;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 0.75rem;
+    font-size: var(--font-size-content);
+    font-weight: bold;
+}
+
+.capsule-tab-button.active {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.capsule-tab-button.active:active {
+    color: var(--primary);
+}
+
+.capsule-tab-button:hover {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.capsule-tab-button:active {
+    color: var(--muted-foreground);
+}
+
+.capsule-tab-button:disabled {
+    cursor: default;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.table-action-button {
+    color: var(--primary);
+    background-color: var(--primary-light);
+    border-radius: var(--radius-md);
+    border-style: none;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 0.5rem;
+    font-size: var(--font-size-content);
+    font-weight: bold;
+}
+
+.table-action-button:hover {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.table-action-button:active {
+    color: var(--muted-foreground);
+}
+
+/* Onboard form full width */
+.tui-onboard-form {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+}
+
+
+/* Columns container */
+.tui-onboard-columns {
+    display: flex;
+}
+
+/* Each column takes equal width */
+.tui-onboard-col {
+    flex: 1 1 0;
+    padding: 0 1rem;
+}
+
+/* Column titles */
+.tui-onboard-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+
+.tui-onboard-divider {
+    width: 2px;
+    align-self: stretch;
+    margin: 0 1rem;
+    background: repeating-linear-gradient(
+            to bottom,
+            var(--border), /* dash color */ var(--border) 12px, /* dash length */ transparent 10px,
+            transparent 20px /* gap length */
+    );
+}
+
+/* =========================================================
+   Inline 3 fields (e.g. NRC dropdowns)
+========================================================= */
+
+.tui-inline-3 {
+    display: flex;
+    gap: 0.75rem; /* spacing between dropdowns */
+    width: 100%;
+}
+
+/* Each direct child shares width equally */
+.tui-inline-3 > * {
+    flex: 1 1 0;
+    min-width: 0; /* IMPORTANT: prevents flex overflow */
+}
+
+/* Ensure dropdown + input stretch fully */
+.tui-inline-3 .tui-input,
+.tui-inline-3 .tui-dropdown,
+.tui-inline-3 .tui-dropdown-trigger {
+    width: 100%;
+}
+
+
+/* =========================================================
+   File upload
+========================================================= */
+.upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border: 1px solid #e0e4e8;
+    border-radius: 12px;
+    font-family: sans-serif;
+    max-width: 500px; /* optional */
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.upload-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.upload-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-foreground);
+}
+
+.upload-subtitle {
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.upload-button {
+    background-color: var(--primary);
+    color: var(--background);
+    padding: 10px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.upload-button:hover {
+    background-color: #0f3d6d;
+}
+
+.tui-upload-hidden-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =========================================================
+   Dialog Component
+========================================================= */
+
+/* ---------------- Modal Layout ---------------- */
+.tui-dialog-modal {
+    text-align: center;
+}
+
+/* ---------------- Success / Error Icons ---------------- */
+.tui-dialog-modal-success-icon,
+.tui-dialog-modal-error-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.tui-dialog-modal-success-icon svg {
+    border-radius: 50%;
+    background-color: var(--success);
+    padding: 10px;
+    color: var(--background);
+}
+
+.tui-dialog-modal-error-icon svg {
+    border-radius: 50%;
+    background-color: var(--red);
+    padding: 10px;
+    color: var(--background);
+}
+
+/* Overlay backdrop */
+.dialog-backdrop {
+    position: fixed;
+    inset: 0; /* top:0; right:0; bottom:0; left:0; */
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+[data-tui-dialog-open="false"].dialog-backdrop {
+    opacity: 0;
+    pointer-events: none;
+}
+
+[data-tui-dialog-hidden="true"].dialog-backdrop {
+    display: none;
+}
+
+
+/* Dialog content wrapper */
+.dialog-content {
+    position: fixed;
+    z-index: 50;
+    left: 50%;
+    top: 50%;
+    width: 30%;
+    transform: translate(-50%, -50%) scale(1);
+    background-color: var(--background);
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    max-width: calc(100% - 2rem);
+    transition: all 0.2s ease-in-out;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+[data-tui-dialog-open="false"].dialog-content {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+    pointer-events: none;
+}
+
+[data-tui-dialog-hidden="true"].dialog-content {
+    display: none;
+}
+
+/* Close button */
+.dialog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border-radius: 0.125rem;
+    opacity: 0.7;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.dialog-close:hover {
+    opacity: 1;
+}
+
+.dialog-close:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ring, #3b82f6);
+}
+
+/* Prevent pointer events on disabled */
+.dialog-close:disabled {
+    pointer-events: none;
+}
+
+/* Icon adjustments inside button */
+.dialog-close svg {
+    pointer-events: none;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.contents {
+    display: inline-block; /* replaces Tailwind 'contents' */
+}
+
+.dialog-close-trigger {
+    display: inline-block; /* replaces Tailwind 'contents' */
+    cursor: pointer;
+}
+
+/* Dialog header */
+.dialog-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* replaces Tailwind 'gap-2' */
+    text-align: center;
+}
+
+/* Footer: replaces Tailwind "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end" */
+.dialog-footer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem; /* gap-2 equivalent */
+}
+
+/* Title: replaces Tailwind "text-lg leading-none font-semibold" */
+.dialog-title {
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1; /* leading-none */
+    font-weight: 600; /* font-semibold */
+    margin-top: 1rem;
+}
+
+/* Description: replaces Tailwind "text-muted-foreground text-sm" */
+.dialog-description {
+    font-size: 0.875rem; /* text-sm */
+    color: var(--muted-foreground); /* muted text color */
+    margin-top: 2rem;
+}
+
